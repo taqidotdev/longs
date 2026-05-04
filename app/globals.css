@@ -53,8 +53,10 @@ button {
   @apply bg-primary text-background hover:text-primary hover:bg-secondary hover:cursor-pointer hover:px-5 duration-150 py-2 px-4 rounded-sm fill-primary
 }
 
-button.
-
 input {
   @apply outline-primary/10 outline-2 pl-2 p-1 text-[1.4rem] hover:outline-primary focus:outline-primary focus:rounded-4xl focus:pl-4 duration-750 not-placeholder-shown:outline-primary
+}
+
+.link {
+@apply fill-secondary flex items-center gap-1 text-primary hover:text-secondary hover:fill-secondary hover:cursor-pointer duration-100
 }
