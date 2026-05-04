@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Updock, Crimson_Pro } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const headerFont = Updock({
+  variable: "--font-header",
+  weight: "400",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const crimsonPro = Crimson_Pro({
+  variable: "--font-serif",
+  weight: "200",
   subsets: ["latin"],
 });
 
@@ -25,9 +27,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${headerFont.variable} ${crimsonPro.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <div className="flex flex-col flex-1 items-center justify-center font-serif bg-radial-[at_0%_0%] from-primary/15 via-background to-primary/15">
+          {children}
+        </div>
+      </body>
     </html>
   );
 }
