@@ -1,11 +1,20 @@
+/* eslint-disable react-hooks/refs */
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MoveLeft } from "lucide-react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export default function Home() {
   const [email, setEmail] = useState("");
+  const [countdown, setCountdown] = useState(30);
+  const countdownRef = useRef(countdown);
+
+  useEffect(() => {
+    countdownRef.current = countdown;
+  });
+
+  const emailRef = useRef(email);
 
   const supabase = createClient();
 
@@ -28,13 +37,66 @@ export default function Home() {
         placeholder="Email"
         onChange={(e) => setEmail(e.target.value)}
       />
+      <div
+        className="flex justify-center items-center hidden flex-col -mt-3"
+        id="magicConfirmation"
+      >
+        <p>Sent a magic link to {emailRef.current}</p>
+        <div className="text-sm flex gap-1">
+          <span className="opacity-60">didn&#39;t receive it? </span>
+          <div className="hidden" id="resend">
+            <span
+              className="link"
+              onClick={() => {
+                supabase.auth.signInWithOtp({ email });
+                emailRef.current = email;
+                const magicConfirmation = document.getElementById("magicConfirmation");
+                if (magicConfirmation) magicConfirmation.innerHTML =
+                  `<p>Resent link to ${emailRef.current}</p>`;
+              }}
+            >
+              resend
+            </span>
+          </div>
+          <span className="opacity-60" id="countdown">
+            resend in {countdown} seconds
+          </span>
+        </div>
+      </div>
       <button
         onClick={() => supabase.auth.signInWithOAuth({ provider: "google" })}
         className="peer-focus:hidden peer-not-placeholder-shown:hidden"
+        id="google"
       >
         <p>Login with Google</p>
       </button>
-      <button className="hidden peer-focus:block peer-not-placeholder-shown:block">
+      <button
+        onClick={() => {
+          supabase.auth.signInWithOtp({ email });
+          document
+            .getElementById("magicConfirmation")
+            ?.classList.remove("hidden");
+          document
+            .getElementById("magicLink")
+            ?.classList.remove(
+              "peer-focus:block",
+              "peer-not-placeholder-shown:block",
+            );
+          document.getElementById("google")?.classList.add("hidden");
+          emailRef.current = email;
+          const countdown = setInterval(() => {
+            if (countdownRef.current <= 2) {
+              document.getElementById("countdown")?.classList.add("hidden");
+              document.getElementById("resend")?.classList.remove("hidden");
+              clearInterval(countdown);
+            } else {
+              setCountdown((prev) => prev - 1);
+            }
+          }, 1000);
+        }}
+        className="hidden peer-focus:block peer-not-placeholder-shown:block"
+        id="magicLink"
+      >
         <p>Send Magic Link</p>
       </button>
     </div>
