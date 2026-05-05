@@ -50,9 +50,10 @@ export default function Home() {
               onClick={() => {
                 supabase.auth.signInWithOtp({ email });
                 emailRef.current = email;
-                const magicConfirmation = document.getElementById("magicConfirmation");
-                if (magicConfirmation) magicConfirmation.innerHTML =
-                  `<p>Resent link to ${emailRef.current}</p>`;
+                const magicConfirmation =
+                  document.getElementById("magicConfirmation");
+                if (magicConfirmation)
+                  magicConfirmation.innerHTML = `<p>Resent link to ${emailRef.current}</p>`;
               }}
             >
               resend
@@ -64,7 +65,12 @@ export default function Home() {
         </div>
       </div>
       <button
-        onClick={() => supabase.auth.signInWithOAuth({ provider: "google" })}
+        onClick={() =>
+          supabase.auth.signInWithOAuth({
+            provider: "google",
+            options: { redirectTo: "http://localhost:3000/auth/callback" },
+          })
+        }
         className="peer-focus:hidden peer-not-placeholder-shown:hidden"
         id="google"
       >
@@ -72,7 +78,11 @@ export default function Home() {
       </button>
       <button
         onClick={() => {
-          supabase.auth.signInWithOtp({ email });
+          supabase.auth.signInWithOtp({
+            email,
+            options: { emailRedirectTo: "http://localhost:3000/home" },
+          });
+
           document
             .getElementById("magicConfirmation")
             ?.classList.remove("hidden");
