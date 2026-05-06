@@ -6,20 +6,29 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export default function Home() {
+
+  const supabase = createClient();
+
   const [email, setEmail] = useState("");
   const [countdown, setCountdown] = useState(30);
   const countdownRef = useRef(countdown);
-
+  
   useEffect(() => {
     countdownRef.current = countdown;
   });
 
+  useEffect(() => {const {data} = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN") {
+        redirect("/home");
+      }
+    })
+
+    return () => data.subscription.unsubscribe();}, [supabase])
+
   const emailRef = useRef(email);
 
-  const supabase = createClient();
-
   return (
-    <div className="flex flex-col justify-center items-center gap-7 mb-7">
+    <div className="flex flex-col flex-wrap justify-center items-center gap-7 mb-7">
       <div
         onClick={() => redirect("/")}
         className="relative right-28 top-6 link"
@@ -38,10 +47,10 @@ export default function Home() {
         onChange={(e) => setEmail(e.target.value)}
       />
       <div
-        className="flex justify-center items-center hidden flex-col -mt-3"
+        className="hidden justify-center items-center flex-col -mt-3"
         id="magicConfirmation"
       >
-        <p>Sent a magic link to {emailRef.current}</p>
+        <p>Sent a magic link to {emailRef.current ?? email}</p>
         <div className="text-sm flex gap-1">
           <span className="opacity-60">didn&#39;t receive it? </span>
           <div className="hidden" id="resend">
@@ -80,12 +89,12 @@ export default function Home() {
         onClick={() => {
           supabase.auth.signInWithOtp({
             email,
-            options: { emailRedirectTo: "http://localhost:3000/home" },
+            options: { emailRedirectTo: "http://localhost:3000/auth/confirm" },
           });
 
           document
             .getElementById("magicConfirmation")
-            ?.classList.remove("hidden");
+            ?.classList.replace("hidden", "flex");
           document
             .getElementById("magicLink")
             ?.classList.remove(
@@ -94,11 +103,11 @@ export default function Home() {
             );
           document.getElementById("google")?.classList.add("hidden");
           emailRef.current = email;
-          const countdown = setInterval(() => {
-            if (countdownRef.current <= 2) {
+          const countdownInterval = setInterval(() => {
+            if (countdownRef.current <= 1) {
               document.getElementById("countdown")?.classList.add("hidden");
               document.getElementById("resend")?.classList.remove("hidden");
-              clearInterval(countdown);
+              clearInterval(countdownInterval);
             } else {
               setCountdown((prev) => prev - 1);
             }
