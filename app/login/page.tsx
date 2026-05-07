@@ -17,14 +17,6 @@ export default function Home() {
     countdownRef.current = countdown;
   });
 
-  useEffect(() => {const {data} = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_IN") {
-        redirect("/home");
-      }
-    })
-
-    return () => data.subscription.unsubscribe();}, [supabase])
-
   const emailRef = useRef(email);
 
   return (
