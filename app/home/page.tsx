@@ -1,13 +1,17 @@
-"use client";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/server";
+import UserOptions from "./components/UserOptions";
 
-export default function Home() {
-  const supabase = createClient();
+export default async function Home() {
+  const supabase = await createClient();
+
+  const { data } = await supabase.auth.getClaims();
 
   return (
-    <div className="flex flex-col h-screen justify-between py-12 items-center">
-      <h1>Record.</h1>
-      <button onClick={() => supabase.auth.signOut()}>Sign Out</button>
+    <div className="flex flex-col w-full h-screen justify-between items-center">
+      <UserOptions claims={data?.claims} />
+      <div className="flex flex-col h-full justify-center pb-20">
+        <h2>Recordings.</h2>
+      </div>
     </div>
   );
 }

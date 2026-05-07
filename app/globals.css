@@ -60,3 +60,7 @@ input {
 .link {
 @apply fill-secondary flex items-center gap-1 text-primary hover:text-secondary hover:fill-secondary hover:cursor-pointer duration-100
 }
+
+.white-link {
+@apply fill-secondary flex items-center gap-1 text-primary hover:text-foreground hover:fill-secondary hover:cursor-pointer duration-100
+}
