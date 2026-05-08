@@ -11,6 +11,7 @@ function UserOptions(data: Claims) {
   const claims = data.claims;
   const supabase = createClient();
 
+  const [name, setName] = useState(`${claims?.user_metadata?.name ?? claims?.email}`)
   const [modalHidden, setModalHidden] = useState(true);
 
   useEffect(() => {
@@ -46,7 +47,7 @@ function UserOptions(data: Claims) {
             setTimeout(() => userOptions?.classList.remove("opacity-0"), 50);
           }}
         >
-          {claims?.user_metadata?.name ?? claims?.email ?? "Unknown User"}
+          {name}
         </p>
         <div
           id="userOptions"
@@ -72,7 +73,18 @@ function UserOptions(data: Claims) {
         </div>
       </div>
       <Modal hidden={modalHidden} title="Set Name">
-        <h1>Hello</h1>
+        <div className="flex flex-col gap-4">
+          <input type="text" name="name" value={name} onChange={(e) => {setName(e.target.value); console.log(name)}}/>
+          <button className="grow-0 m-auto" onClick={() => {
+            supabase.auth.updateUser({
+              data: {
+                name
+              }
+            });
+            supabase.auth.refreshSession();
+            setModalHidden(true);
+          }}>Save</button>
+        </div>
       </Modal>
     </div>
   );

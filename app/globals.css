@@ -54,7 +54,7 @@ button {
 }
 
 input {
-  @apply outline-primary/10 outline-2 pl-2 p-1 text-[1.4rem] hover:outline-primary focus:outline-primary focus:rounded-4xl focus:pl-4 duration-750 not-placeholder-shown:outline-primary
+  @apply outline-primary/10 outline-2 pl-3 p-1 text-[1.4rem] hover:outline-primary focus:outline-primary focus:rounded-4xl duration-750 not-placeholder-shown:outline-primary
 }
 
 .link {
