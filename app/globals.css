@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@plugin 'tailwind-scrollbar';
+
 :root {
   --background: #f6e8e4;
   --foreground: #0f0705;
@@ -43,6 +45,10 @@ h2 {
 
 h4 {
   @apply text-[1.7rem]
+}
+
+h5 {
+  @apply text-[1.4rem]
 }
 
 p {

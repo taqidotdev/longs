@@ -17,7 +17,6 @@ function UserOptions(data: Claims) {
   useEffect(() => {
     const userOptions = document.getElementById("userOptions");
     const handleMouseUp = (e: MouseEvent) => {
-      console.log(e.target);
       if (
         e.target !== userOptions &&
         e.target !== document.getElementById("name")
@@ -32,11 +31,11 @@ function UserOptions(data: Claims) {
 
     document.addEventListener("mouseup", handleMouseUp);
 
-    return () => {console.log("removing event listener"); document.removeEventListener("mouseup", handleMouseUp);}
+    return () => {document.removeEventListener("mouseup", handleMouseUp);}
   });
 
   return (
-    <div className="w-full">
+    <div className="w-full absolute">
       <div className="flex flex-col w-full items-end pr-10 pt-5">
         <p
           className="link"
@@ -74,7 +73,7 @@ function UserOptions(data: Claims) {
       </div>
       <Modal hidden={modalHidden} title="Set Name">
         <div className="flex flex-col gap-4">
-          <input type="text" name="name" value={name} onChange={(e) => {setName(e.target.value); console.log(name)}}/>
+          <input type="text" name="name" value={name} onChange={(e) => {setName(e.target.value);}}/>
           <button className="grow-0 m-auto" onClick={() => {
             supabase.auth.updateUser({
               data: {
