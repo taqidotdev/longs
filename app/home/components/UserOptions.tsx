@@ -15,13 +15,12 @@ function UserOptions(data: Claims) {
 
   useEffect(() => {
     const userOptions = document.getElementById("userOptions");
-    const handleMouseUp = (e: Event) => {
+    const handleMouseUp = (e: MouseEvent) => {
       console.log(e.target);
       if (
         e.target !== userOptions &&
         e.target !== document.getElementById("name")
       ) {
-        console.log("removing");
         userOptions?.classList.add("opacity-0");
         setTimeout(
           () => userOptions?.classList.replace("absolute", "hidden"),
@@ -29,16 +28,14 @@ function UserOptions(data: Claims) {
         );
       }
 
-      if (!modalHidden && e.target !== document.getElementById("mainModal")) {
+      if (!modalHidden && !document.getElementById("mainModal")?.contains(e.target as Node)) {
         setModalHidden(true);
       }
     };
 
-    document.addEventListener("mouseup", (e) => {
-      handleMouseUp(e);
-    });
+    document.addEventListener("mouseup", handleMouseUp);
 
-    return () => document.removeEventListener("mouseup", handleMouseUp);
+    return () => {console.log("removing event listener"); document.removeEventListener("mouseup", handleMouseUp);}
   });
 
   return (
