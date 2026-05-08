@@ -21,14 +21,10 @@ function UserOptions(data: Claims) {
         e.target !== userOptions &&
         e.target !== document.getElementById("name")
       ) {
-        userOptions?.classList.add("opacity-0");
-        setTimeout(
-          () => userOptions?.classList.replace("absolute", "hidden"),
-          150,
-        );
+        userOptions?.classList.replace("absolute", "hidden")
       }
 
-      if (!modalHidden && !document.getElementById("mainModal")?.contains(e.target as Node)) {
+      if (!modalHidden && (!document.getElementById("mainModal")?.contains(e.target as Node) || e.target === document.getElementById("closeModal"))) {
         setModalHidden(true);
       }
     };
@@ -54,7 +50,7 @@ function UserOptions(data: Claims) {
         </p>
         <div
           id="userOptions"
-          className="bg-secondary rounded-lg rounded-tr-none p-2 px-4 hidden opacity-0 top-14 text-center duration-150"
+          className="bg-secondary rounded-lg rounded-tr-none p-2 px-4 hidden opacity-0 top-14 text-center duration-100"
         >
           <p
             className="white-link"
@@ -75,7 +71,9 @@ function UserOptions(data: Claims) {
           </p>
         </div>
       </div>
-      <Modal hidden={modalHidden} />
+      <Modal hidden={modalHidden} title="Set Name">
+        <h1>Hello</h1>
+      </Modal>
     </div>
   );
 }

@@ -64,3 +64,17 @@ input {
 .white-link {
 @apply fill-secondary flex items-center gap-1 text-primary hover:text-foreground hover:fill-secondary hover:cursor-pointer duration-100
 }
+
+.is-invisible {
+  @apply hidden transition-discrete
+}
+
+.is-visible {
+  @apply opacity-100 absolute
+}
+
+@starting-style {
+  .is-visible {
+    @apply opacity-0
+  }
+}
