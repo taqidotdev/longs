@@ -84,10 +84,6 @@ input {
   @apply opacity-100 absolute
 }
 
-.scrollbar-hidden {
-  @apply 
-}
-
 @starting-style {
   .is-visible {
     @apply opacity-0
