@@ -37,7 +37,7 @@ body {
 }
 
 body {
-  @apply scrollbar-thumb-primary scrollbar-track-secondary/30
+  @apply scrollbar-thumb-primary scrollbar-track-secondary/0
 }
 
 h1 {

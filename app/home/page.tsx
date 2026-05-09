@@ -4,6 +4,7 @@ import Recordings from "./components/Recordings";
 
 export default async function Home() {
   const supabase = await createClient();
+  console.log((await supabase.storage.from("audio").list()))
 
   const { data } = await supabase.auth.getClaims();
 
@@ -14,7 +15,7 @@ export default async function Home() {
         <div className="">
           <h2>Recordings.</h2>
         </div>
-        <Recordings />
+        <Recordings recordings={[]} />
       </div>
     </div>
   );

@@ -1,8 +1,16 @@
 "use client";
-import { Pencil, ArrowDownToLine } from "lucide-react";
+import { Pencil, ArrowDownToLine, Trash } from "lucide-react";
 import { useState } from "react";
 
-function RecordingPlayer({ recordingDuration, title, notes }: { recordingDuration: number; title: string; notes: string; }) {
+function RecordingPlayer({
+  recordingDuration,
+  title,
+  notes,
+}: {
+  recordingDuration: number;
+  title: string;
+  notes: string;
+}) {
   const zeroPadding = (duration: number) => {
     const durationString = duration.toString();
     if (durationString.length === 2) {
@@ -19,7 +27,7 @@ function RecordingPlayer({ recordingDuration, title, notes }: { recordingDuratio
 
   return (
     <div
-      className={`bg-primary/15 outline-primary outline-2 ${isPlaying ? "" : "opacity-75"} hover:opacity-100 duration-100 rounded-sm hover:rounded-2xl flex flex-col md:flex-row items-center overflow-x-hidden`}
+      className={`bg-primary/15 outline-primary outline-2 ${isPlaying ? "" : "opacity-60"} hover:opacity-100 duration-100 rounded-sm hover:rounded-2xl flex flex-col md:flex-row items-center overflow-x-hidden`}
     >
       <div className="md:max-w-[min(50%,24rem)] p-2 px-3 flex items-center gap-2 overflow-clip">
         <div
@@ -33,7 +41,7 @@ function RecordingPlayer({ recordingDuration, title, notes }: { recordingDuratio
               stroke="currentColor"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="lucide lucide-circle-pause-icon lucide-circle-pause fill-none stroke-0 size-11 hover:size-12 hover:cursor-pointer hover:rotate-360 duration-300"
+              className="lucide lucide-circle-pause-icon lucide-circle-pause fill-none stroke-0 size-11 hover:size-12 hover:cursor-pointer hover:rotate-180 duration-300"
             >
               <circle cx="12" cy="12" r="10" className="fill-primary" />
               <line
@@ -58,7 +66,7 @@ function RecordingPlayer({ recordingDuration, title, notes }: { recordingDuratio
               stroke="currentColor"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="lucide lucide-circle-play-icon lucide-circle-play fill-none stroke-0 size-11 hover:size-12 hover:cursor-pointer hover:rotate-360 duration-300"
+              className="lucide lucide-circle-play-icon lucide-circle-play fill-none stroke-0 size-11 hover:size-12 hover:cursor-pointer hover:rotate-180 duration-300"
             >
               <circle cx="12" cy="12" r="10" className="fill-primary" />
               <path
@@ -80,11 +88,27 @@ function RecordingPlayer({ recordingDuration, title, notes }: { recordingDuratio
       <div className="flex w-full px-3 py-2 md:py-0 justify-between overflow-hidden">
         <div className="flex flex-col h-full justify-center overflow-auto scrollbar-thin">
           <h5>{title}</h5>
-          <div className="w-full overflow-auto scrollbar-thin"><span className="text-md">{notes}</span></div>
+          <div className="w-full overflow-auto scrollbar-thin">
+            <span className="text-md">{notes}</span>
+          </div>
         </div>
         <div className="flex justify-center items-center pl-3">
           <Pencil className="stroke-primary hover:stroke-secondary hover:cursor-pointer hover:-rotate-7 duration-100" />
           <ArrowDownToLine className="stroke-primary hover:stroke-secondary hover:cursor-pointer duration-100 hover:-mb-1" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="lucide lucide-trash-icon lucide-trash stroke-primary hover:stroke-secondary hover:cursor-pointer duration-100 group size-6 overflow-visible hover:-mb-1"
+          >
+            <path d="M19 7v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7" />
+            <g className="group-hover:-translate-y-1 duration-100">
+              <path d="M3 6h18" />
+              <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+            </g>
+          </svg>
         </div>
       </div>
     </div>
