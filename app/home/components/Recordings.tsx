@@ -6,7 +6,7 @@ function Recordings() {
       {/* <div className="h-full flex justify-center items-center">
         <h4>No Recordings</h4>
       </div> */}
-      <RecordingPlayer recordingDuration={1232} title="rickroll" notes="12312312321ashigklaskhgiuash21321321ihadsughahg" />
+      <RecordingPlayer recordingDuration={1232} title="rickrollasdasdakdiasuhdashd" notes="12312312321ashigklaskhgiuash21321321ihadsughahg" />
     </div>
   );
 }

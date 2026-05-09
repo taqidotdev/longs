@@ -78,9 +78,9 @@ function RecordingPlayer({ recordingDuration, title, notes }: { recordingDuratio
       </div>
       <div className="w-full md:h-full md:w-0 p-[0.05rem] bg-primary" />
       <div className="flex w-full px-3 py-2 md:py-0 justify-between overflow-hidden">
-        <div className="flex flex-col h-full justify-center overflow-auto">
+        <div className="flex flex-col h-full justify-center overflow-auto scrollbar-thin">
           <h5>{title}</h5>
-          <div className="w-full"><span className="text-md">{notes}</span></div>
+          <div className="w-full overflow-auto scrollbar-thin"><span className="text-md">{notes}</span></div>
         </div>
         <div className="flex justify-center items-center pl-3">
           <Pencil className="stroke-primary hover:stroke-secondary hover:cursor-pointer hover:-rotate-7 duration-100" />
