@@ -14,26 +14,6 @@ function UserOptions(data: Claims) {
   const [name, setName] = useState(`${claims?.user_metadata?.name ?? claims?.email}`)
   const [modalHidden, setModalHidden] = useState(true);
 
-  useEffect(() => {
-    const userOptions = document.getElementById("userOptions");
-    const handleMouseUp = (e: MouseEvent) => {
-      if (
-        e.target !== userOptions &&
-        e.target !== document.getElementById("name")
-      ) {
-        userOptions?.classList.replace("absolute", "hidden")
-      }
-
-      if (!modalHidden && (!document.getElementById("mainModal")?.contains(e.target as Node) || e.target === document.getElementById("closeModal"))) {
-        setModalHidden(true);
-      }
-    };
-
-    document.addEventListener("mouseup", handleMouseUp);
-
-    return () => {document.removeEventListener("mouseup", handleMouseUp);}
-  });
-
   return (
     <div className="w-full absolute">
       <div className="flex flex-col w-full items-end pr-10 pt-5">
@@ -71,7 +51,7 @@ function UserOptions(data: Claims) {
           </p>
         </div>
       </div>
-      <Modal hidden={modalHidden} title="Set Name">
+      <Modal hidden={modalHidden} setHidden={setModalHidden} title="Set Name">
         <div className="flex flex-col gap-4">
           <input type="text" name="name" value={name} onChange={(e) => {setName(e.target.value);}}/>
           <button className="grow-0 m-auto" onClick={() => {
