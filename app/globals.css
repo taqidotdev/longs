@@ -68,6 +68,10 @@ input {
   @apply outline-primary/10 outline-2 pl-3 p-1 text-[1.4rem] hover:outline-primary focus:outline-primary focus:rounded-4xl duration-750 not-placeholder-shown:outline-primary
 }
 
+textarea {
+  @apply outline-primary/10 w-full outline-2 pl-3 p-1 text-xl hover:outline-primary focus:outline-primary focus:rounded-2xl duration-500 resize-none not-placeholder-shown:outline-primary
+}
+
 .link {
 @apply fill-secondary flex items-center gap-1 text-primary hover:text-secondary hover:fill-secondary hover:cursor-pointer duration-100
 }

@@ -15,12 +15,7 @@ function Modal({
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const userOptions = document.getElementById("userOptions");
     const handleMouseUp = (e: MouseEvent) => {
-      if (e.target !== userOptions) {
-        userOptions?.classList.replace("absolute", "hidden");
-      }
-
       if (
         !hidden &&
         (!modalRef.current?.contains(e.target as Node) ||
@@ -31,12 +26,12 @@ function Modal({
       }
     };
 
-    document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener("mousedown", handleMouseUp);
 
     return () => {
-      document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener("mousedown", handleMouseUp);
     };
-  }, [hidden, setHidden]);
+  });
 
   return (
     <div

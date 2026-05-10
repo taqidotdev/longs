@@ -1,12 +1,13 @@
 import { createClient } from "@/lib/supabase/server";
 import UserOptions from "./components/UserOptions";
-import Recordings from "./components/Recordings";
+import Recordings, { recordingsSchema } from "./components/Recordings";
 
 export default async function Home() {
   const supabase = await createClient();
-  console.log((await supabase.storage.from("audio").list()))
 
   const { data } = await supabase.auth.getClaims();
+
+  const recordings = (await supabase.from("recordings").select().order("when", { ascending: false})).data;
 
   return (
     <div className="w-full h-screen">
@@ -15,7 +16,7 @@ export default async function Home() {
         <div className="">
           <h2>Recordings.</h2>
         </div>
-        <Recordings recordings={[]} />
+        <Recordings recordings={recordings as unknown as recordingsSchema[]} />
       </div>
     </div>
   );
