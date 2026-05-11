@@ -16,7 +16,7 @@ export default async function Home() {
         <div className="">
           <h2>Recordings.</h2>
         </div>
-        <Recordings recordings={recordings as unknown as recordingsSchema[]} />
+        <Recordings recordings={recordings as unknown as recordingsSchema[]} userId={data?.claims.sub ?? ""} />
       </div>
     </div>
   );

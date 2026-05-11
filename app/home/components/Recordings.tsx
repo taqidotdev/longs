@@ -6,11 +6,10 @@ export interface recordingsSchema {
   title: string | null;
   notes: string | null;
   duration: number | null;
-  audio_link: string | null;
-  image_link: string | null;
+  peaks: number[][];
 }
 
-function Recordings({ recordings }: { recordings: recordingsSchema[] | null }) {
+function Recordings({ recordings, userId }: { recordings: recordingsSchema[] | null; userId: string }) {
   console.log(recordings);
   return (
     <div className="bg-primary/15 outline-primary outline-3 w-3/4 xl:max-w-7/12 h-1/2 overflow-auto scrollbar flex flex-col px-5 py-4 overflow-x-clip scroll-m-4">
@@ -22,7 +21,7 @@ function Recordings({ recordings }: { recordings: recordingsSchema[] | null }) {
               id={recording.id}
               recordingDuration={recording.duration ?? 0}
               title={recording.title ?? "Untitled Recording"}
-              notes={recording.notes ?? ""}
+              notes={recording.notes ?? ""} userId={userId} peaks={recording.peaks}
             />
           ))}
         </div>
