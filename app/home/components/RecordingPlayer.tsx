@@ -3,9 +3,7 @@ import {
   Pencil,
   ArrowDownToLine,
   LoaderCircle,
-  ArrowBigDownDashIcon,
   ArrowBigDownDash,
-  Circle,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Modal from "./Modal";
@@ -93,15 +91,17 @@ function RecordingPlayer({
   });
 
   const fetchAudio = async () => {
+    setIsLoading(true);
     const recording = await fetch(
       (
         await supabase.storage
           .from("audios")
-          .createSignedUrl(`${userId}/1.mp3`, 120)
+          .createSignedUrl(`${userId}/${id}.mp3`, 120)
       ).data?.signedUrl ?? "",
     );
 
     setRecordingUrl(URL.createObjectURL(await recording.blob()));
+    setIsLoading(false);
   };
 
   const handlePlay = async () => {
@@ -110,13 +110,9 @@ function RecordingPlayer({
 
       return;
     }
-
-    setIsLoading(true);
     console.log("hello");
 
     await fetchAudio();
-
-    setIsLoading(false);
   };
 
   return (
