@@ -62,6 +62,14 @@ textarea {
   @apply outline-primary/10 w-full outline-2 pl-3 p-1 text-xl hover:outline-primary focus:outline-primary focus:rounded-2xl duration-500 resize-none not-placeholder-shown:outline-primary
 }
 
+select {
+  @apply bg-primary text-background p-1 rounded-sm outline-3 hover:outline-secondary focus:outline-secondary duration-200 max-w-110
+}
+
+select:disabled {
+  @apply bg-foreground/50 outline-0
+}
+
 .link {
 @apply fill-secondary flex items-center gap-1 text-primary hover:text-secondary hover:fill-secondary hover:cursor-pointer duration-100
 }

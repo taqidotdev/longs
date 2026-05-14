@@ -1,22 +1,34 @@
 import { createClient } from "@/lib/supabase/server";
 import UserOptions from "./components/UserOptions";
 import Recordings, { recordingsSchema } from "./components/Recordings";
+import RecordNew from "./components/RecordNew";
 
 export default async function Home() {
   const supabase = await createClient();
 
   const { data } = await supabase.auth.getClaims();
 
-  const recordings = (await supabase.from("recordings").select().order("when", { ascending: false})).data;
+  const recordings = (
+    await supabase
+      .from("recordings")
+      .select()
+      .order("when", { ascending: false })
+  ).data;
 
   return (
     <div className="w-full h-screen">
       <UserOptions claims={data?.claims} />
-      <div className="flex flex-col w-full h-screen justify-around items-center">
+      <div className="flex flex-col h-screen justify-around items-center py-30">
         <div className="">
           <h2>Recordings.</h2>
         </div>
-        <Recordings recordings={recordings as unknown as recordingsSchema[]} userId={data?.claims.sub ?? ""} />
+        <div className="h-full min-w-104 w-3/4 xl:max-w-7/12 flex flex-col justify-end items-center gap-2">
+          <RecordNew />
+          <Recordings
+            recordings={recordings as unknown as recordingsSchema[]}
+            userId={data?.claims.sub ?? ""}
+          />
+        </div>
       </div>
     </div>
   );

@@ -120,7 +120,7 @@ function RecordingPlayer({
       <div
         className={`bg-primary/15 outline-primary outline-2 ${isPlaying ? "" : "opacity-60"} hover:opacity-100 duration-100 rounded-sm hover:rounded-2xl flex flex-col md:flex-row items-center overflow-x-hidden`}
       >
-        <div className="md:min-w-90  p-2 px-3 flex items-center gap-2 overflow-clip">
+        <div className="md:min-w-90 p-2 px-3 flex items-center gap-2 overflow-clip">
           <div
             className="size-12 flex shrink-0 justify-center items-center"
             onClick={() => {
