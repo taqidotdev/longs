@@ -5,10 +5,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import RecordPlugin from "wavesurfer.js/dist/plugins/record.js";
 
 function RecordNew() {
-  const [microphone, setMicrophone] = useState<string>();
-  const [microphoneOptions, setMicrophoneOptions] = useState<MediaDeviceInfo[]>(
-    [],
-  );
   const [recordingUrl, setRecordingUrl] = useState<string>();
   const [recordingPlugin, setRecordingPlugin] = useState<RecordPlugin>();
 
@@ -45,32 +41,13 @@ function RecordNew() {
     });
   }, [wavesurfer]);
 
-  useEffect(() => {
-    RecordPlugin.getAvailableAudioDevices().then((devices) => {
-      console.log(
-        `devices: ${devices.map((d) => `${d.label}: ${d.deviceId}`)}`,
-      );
-      if (devices?.length)
-        setMicrophoneOptions(devices.filter((device) => device.deviceId));
-    });
-  }, []);
-
   const handleRecord = () => {
-    console.log(`microphone: ${microphone}`);
     if (recordingPlugin?.isRecording()) {
       recordingPlugin.stopRecording();
       return;
     }
-    if (!microphone) {
-      RecordPlugin.getAvailableAudioDevices().then((devices) => {
-        console.log(`deeeeevices: ${JSON.stringify(devices)}`);
-        if (devices.length)
-          setMicrophone(devices.filter((d) => d.deviceId)[0]?.deviceId);
-      });
-    }
 
-    console.log(`mikrofone: ${microphone}`);
-    recordingPlugin?.startRecording({ deviceId: microphone });
+    recordingPlugin?.startRecording();
   };
 
   return (
@@ -98,33 +75,6 @@ function RecordNew() {
             >
               <MicIcon className="duration-150" />
             </div>
-          </div>
-          <div className="flex flex-col justify-end">
-            <label htmlFor="mic" className="text-end">
-              Select Microphone
-            </label>
-
-            {(microphoneOptions?.length ?? 0) > 1 ? (
-              <select
-                id="mic"
-                value={microphone}
-                onChange={(e) => setMicrophone(e.target.value)}
-              >
-                {microphoneOptions.map((device, index) => {
-                  if (device.deviceId) {
-                    return (
-                      <option value={device.deviceId} key={index}>
-                        {device.label ?? device.deviceId}
-                      </option>
-                    );
-                  }
-                })}
-              </select>
-            ) : (
-              <select disabled id="mic">
-                <option>Enable microphones permission</option>
-              </select>
-            )}
           </div>
         </div>
       )}
