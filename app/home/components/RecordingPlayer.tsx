@@ -36,23 +36,12 @@ function RecordingPlayer({
     .eq("id", id)
     .then((x) => console.log(x));
 
-  const zeroPadding = (duration: number) => {
-    const durationString = duration.toString();
-    if (durationString.length === 2) {
-      return durationString;
-    }
-
-    return `0${durationString}`;
-  };
-
   const [modalHidden, setModalHidden] = useState(true);
   const [modalAction, setModalAction] = useState("");
   const [newTitle, setNewTitle] = useState(title);
   const [newNotes, setNewNotes] = useState(notes);
   const [isLoading, setIsLoading] = useState(false);
-  const [duration, setDuration] = useState(
-    `${zeroPadding(Math.floor(recordingDuration / 60))}:${zeroPadding(recordingDuration % 60)}`,
-  );
+  const [duration, setDuration] = useState(formatDuration(recordingDuration));
   const [recordingUrl, setRecordingUrl] = useState("");
 
   const waveformRef = useRef(null);
@@ -74,9 +63,7 @@ function RecordingPlayer({
   const handleTimeUpdate = () => {
     const dur = Math.floor(currentTime ?? recordingDuration);
     console.log(dur);
-    setDuration(
-      `${zeroPadding(Math.floor(dur / 60))}:${zeroPadding(dur % 60)}`,
-    );
+    setDuration(formatDuration(dur));
   };
 
   useEffect(() => {
@@ -299,6 +286,19 @@ function RecordingPlayer({
       </Modal>
     </>
   );
+}
+
+function zeroPadding(duration: number) {
+  const durationString = duration.toString();
+  if (durationString.length === 2) {
+    return durationString;
+  }
+
+  return `0${durationString}`;
+}
+
+export function formatDuration(duration: number) {
+  return `${zeroPadding(Math.floor(duration / 60))}:${zeroPadding(duration % 60)}`;
 }
 
 export default RecordingPlayer;

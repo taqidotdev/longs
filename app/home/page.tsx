@@ -23,7 +23,7 @@ export default async function Home() {
           <h2>Recordings.</h2>
         </div>
         <div className="h-full min-w-104 w-3/4 xl:max-w-7/12 flex flex-col justify-end items-center gap-2">
-          <RecordNew />
+          <RecordNew userId={data?.claims.sub ?? ""} />
           <Recordings
             recordings={recordings as unknown as recordingsSchema[]}
             userId={data?.claims.sub ?? ""}
