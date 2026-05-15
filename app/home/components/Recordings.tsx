@@ -12,7 +12,7 @@ export interface recordingsSchema {
 function Recordings({ recordings, userId }: { recordings: recordingsSchema[] | null; userId: string }) {
   console.log(recordings);
   return (
-    <div className="bg-primary/15 outline-primary outline-3 w-full h-5/7 overflow-auto scrollbar flex flex-col px-5 py-4 overflow-x-clip scroll-m-4">
+    <div className="bg-primary/15 outline-primary outline-3 w-full h-[50vh] overflow-auto scrollbar flex flex-col px-5 py-4 overflow-x-clip scroll-m-4">
       {recordings?.length ? (
         <div className="flex flex-col gap-4">
           {recordings.map((recording, index) => (
