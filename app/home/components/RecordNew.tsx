@@ -100,7 +100,7 @@ function RecordNew({ userId }: { userId: string }) {
     <>
       <div className="flex flex-col gap-3 w-full">
         <div
-          className={`flex flex-col gap-1 w-full ${isModifying ? "" : "hidden"}`}
+          className={`flex flex-col gap-1 w-full ${isModifying && !isUploading ? "" : "hidden"}`}
         >
           <div className="w-full flex gap-3 flex-col md:flex-row">
             <input
@@ -111,7 +111,7 @@ function RecordNew({ userId }: { userId: string }) {
               className="max-w-72"
             />
             <div className="flex gap-2 items-center w-full">
-              <p>Notes:</p>{" "}
+              <p>Notes:</p>
               <input
                 type="text"
                 value={notes}
