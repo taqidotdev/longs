@@ -1,3 +1,5 @@
+"use client"
+import { useState } from "react";
 import RecordingPlayer from "./RecordingPlayer";
 
 export interface recordingsSchema {
@@ -10,7 +12,11 @@ export interface recordingsSchema {
 }
 
 function Recordings({ recordings, userId }: { recordings: recordingsSchema[] | null; userId: string }) {
-  console.log(recordings);
+  
+  const [key, setKey] = useState(0);
+  
+  const refresh = () => setKey(key + 1);
+
   return (
     <div className="bg-primary/15 outline-primary outline-3 w-full h-[50vh] overflow-auto scrollbar flex flex-col px-5 py-4 overflow-x-clip scroll-m-4">
       {recordings?.length ? (
@@ -22,6 +28,7 @@ function Recordings({ recordings, userId }: { recordings: recordingsSchema[] | n
               recordingDuration={recording.duration ?? 0}
               title={recording.title ?? "Untitled Recording"}
               notes={recording.notes ?? ""} userId={userId} peaks={recording.peaks}
+              refresh={refresh}
             />
           ))}
         </div>
