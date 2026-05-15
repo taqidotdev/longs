@@ -58,6 +58,10 @@ input {
   @apply outline-primary/10 outline-2 pl-3 p-1 text-[1.4rem] hover:outline-primary focus:outline-primary focus:rounded-4xl duration-750 not-placeholder-shown:outline-primary
 }
 
+input.small {
+  @apply text-lg pl-2 duration-500
+}
+
 textarea {
   @apply outline-primary/10 w-full outline-2 pl-3 p-1 text-xl hover:outline-primary focus:outline-primary focus:rounded-2xl duration-500 resize-none not-placeholder-shown:outline-primary
 }

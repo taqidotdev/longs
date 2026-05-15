@@ -18,10 +18,9 @@ import Modal from "./Modal";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
-function RecordNew({userId}: {userId: string}) {
-
+function RecordNew({ userId }: { userId: string }) {
   const supabase = createClient();
-  const router = useRouter()
+  const router = useRouter();
 
   const [recordingUrl, setRecordingUrl] = useState<string>();
   const [recordingPlugin, setRecordingPlugin] = useState<RecordPlugin>();
@@ -33,12 +32,16 @@ function RecordNew({userId}: {userId: string}) {
   const [modalHidden, setModalHidden] = useState(true);
   const [modalAction, setModalAction] = useState("Delete");
 
+  const [title, setTitle] = useState("");
+  const [notes, setNotes] = useState("");
+
   const waveformRef = useRef(null);
 
   const { wavesurfer, isPlaying } = useWavesurfer({
     container: waveformRef,
     waveColor: "#e1ac9d",
     progressColor: "#823a26",
+    cursorWidth: 0,
     height: "auto",
     width: "auto",
     normalize: true,
@@ -95,103 +98,146 @@ function RecordNew({userId}: {userId: string}) {
 
   return (
     <>
-      <div className="w-full flex items-end justify-between pb-1 h-20">
-        {isModifying ? (
-          <div className="flex flex-col items-center gap-1">
-            <span>{formatDuration(duration)}</span>
-            <IconButton
-              onClick={() => {
-                wavesurfer?.playPause();
-              }}
-            >
-              {isPlaying ? (
-                <Pause className="duration-150 stroke-none fill-current" />
-              ) : (
-                <Play className="duration-150 stroke-none fill-current" />
-              )}
-            </IconButton>
+      <div className="flex flex-col gap-3 w-full">
+        <div
+          className={`flex flex-col gap-1 w-full ${isModifying ? "" : "hidden"}`}
+        >
+          <div className="w-full flex gap-3 flex-col md:flex-row">
+            <input
+              type="text"
+              value={title}
+              placeholder="Untitled Recording"
+              onChange={(e) => setTitle(e.target.value)}
+              className="max-w-72"
+            />
+            <div className="flex gap-2 items-center w-full">
+              <p>Notes:</p>{" "}
+              <input
+                type="text"
+                value={notes}
+                placeholder="notes"
+                onChange={(e) => setNotes(e.target.value)}
+                className="small w-full"
+              />
+            </div>
           </div>
-        ) : (
-          <div>
-            <div className="flex">
-              <div className="flex flex-col justify-center items-center gap-1">
-                {recordingPlugin?.isRecording() ? (
-                  <span>{formatDuration(duration)}</span>
+        </div>
+        <div className="w-full flex items-end justify-between pb-1">
+          {isModifying ? (
+            <div className="flex flex-col items-center gap-1">
+              <IconButton
+                onClick={() => {
+                  wavesurfer?.playPause();
+                }}
+              >
+                {isPlaying ? (
+                  <Pause className="duration-150 stroke-none fill-current" />
                 ) : (
-                  <div />
+                  <Play className="duration-150 stroke-none fill-current" />
                 )}
-                <IconButton onClick={handleRecord}>
+              </IconButton>
+            </div>
+          ) : (
+            <div>
+              <div className="flex">
+                <div className="flex flex-col justify-center items-center gap-1">
                   {recordingPlugin?.isRecording() ? (
-                    <Square className="fill-current size-5" />
+                    <span>{formatDuration(duration)}</span>
                   ) : (
-                    <MicIcon />
+                    <div />
                   )}
-                </IconButton>
+                  <IconButton onClick={handleRecord}>
+                    {recordingPlugin?.isRecording() ? (
+                      <Square className="fill-current size-5" />
+                    ) : (
+                      <MicIcon />
+                    )}
+                  </IconButton>
+                </div>
+              </div>
+            </div>
+          )}
+          <div className="flex flex-col w-full">
+            <div className="w-full flex justify-center items-center pr-3">
+              <div
+                ref={waveformRef}
+                className={`h-12 px-3 w-full ${recordingPlugin?.isRecording() || isModifying ? "" : "hidden"}`}
+              />
+              <div
+                className={`bg-primary text-secondary text-md px-2 rounded-lg cursor-default h-6 w-13 flex justify-center items-center overflow-clip ${isModifying ? "" : "hidden"}`}
+              >
+                <span>{formatDuration(duration)}</span>
               </div>
             </div>
           </div>
-        )}
-        <div
-          ref={waveformRef}
-          className={`h-12 px-3 w-full ${recordingPlugin?.isRecording() || isModifying ? "" : "hidden"}`}
-        />
-        {isModifying ? (
-          isUploading ? (
-            <div className="md:min-w-40 flex gap-2 items-center justify-center h-12">
-              <h4>Uploading</h4>
-              <LoaderCircle className="animate-spin stroke-primary size-7 mt-1" />
-            </div>
+          {isModifying ? (
+            isUploading ? (
+              <div className="md:min-w-40 flex gap-2 items-center justify-center h-12">
+                <h4>Uploading</h4>
+                <LoaderCircle className="animate-spin stroke-primary size-7 mt-1" />
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <IconButton
+                  onClick={() => {
+                    setModalAction("Effects");
+                    setModalHidden(false);
+                  }}
+                >
+                  <Sparkles />
+                </IconButton>
+                <IconButton
+                  onClick={async () => {
+                    console.log(recordingUrl);
+
+                    const recordingData = await (
+                      await fetch(recordingUrl ?? "")
+                    ).blob();
+
+                    if (!recordingData) return;
+
+                    setIsUploading(true);
+
+                    const id = (
+                      await supabase
+                        .from("recordings")
+                        .insert({
+                          title,
+                          notes,
+                          duration,
+                          user_id: userId,
+                          peaks: wavesurfer?.exportPeaks(),
+                        })
+                        .select("id")
+                    ).data?.at(0)?.id;
+
+                    console.log(`${userId}/${id}.mp3`);
+
+                    await supabase.storage
+                      .from("audios")
+                      .upload(`${userId}/${id}.mp3`, recordingData);
+
+                    setIsModifying(false);
+                    setIsUploading(false);
+                    router.refresh();
+                  }}
+                >
+                  <Check className="size-8 mt-1 stroke-[1.5]" />
+                </IconButton>
+                <IconButton
+                  onClick={() => {
+                    setModalAction("Delete");
+                    setModalHidden(false);
+                  }}
+                >
+                  <Trash />
+                </IconButton>
+              </div>
+            )
           ) : (
-            <div className="flex gap-2">
-              <IconButton
-                onClick={() => {
-                  setModalAction("Effects");
-                  setModalHidden(false);
-                }}
-              >
-                <Sparkles />
-              </IconButton>
-              <IconButton
-                onClick={async () => {
-
-                  console.log(recordingUrl)
-
-                  const recordingData = await (await fetch(recordingUrl ?? "")).blob();
-
-                  if (!recordingData) return;
-
-                  setIsUploading(true);
-
-                  const id = await supabase.from("recordings").insert({
-                    title: null,
-                    notes: null,
-                    user_id: userId,
-                    duration,
-                    peaks: wavesurfer?.exportPeaks()
-                  }).select("id")
-
-                  await supabase.storage.from("audios").upload(`${userId}/${id}.mp3`, recordingData);
-
-                  setIsModifying(false);
-                  setIsUploading(false);
-                  router.refresh();
-                }}
-              >
-                <Check className="size-8 mt-1 stroke-[1.5]" />
-              </IconButton>
-              <IconButton
-                onClick={() => {
-                  setModalAction("Delete");
-                  setModalHidden(false);
-                }}
-              >
-                <Trash />
-              </IconButton>
-            </div>
-          )
-        ) : (
-          <div />
-        )}
+            <div />
+          )}
+        </div>
       </div>
       <Modal
         title={modalAction}

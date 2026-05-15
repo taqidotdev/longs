@@ -34,7 +34,7 @@ function RecordingPlayer({
     .from("recordings")
     .select()
     .eq("id", id)
-    .then((x) => console.log(x));
+    .then();
 
   const [modalHidden, setModalHidden] = useState(true);
   const [modalAction, setModalAction] = useState("");
