@@ -30,11 +30,7 @@ function RecordingPlayer({
 
   const supabase = createClient();
 
-  supabase
-    .from("recordings")
-    .select()
-    .eq("id", id)
-    .then();
+  supabase.from("recordings").select().eq("id", id).then();
 
   const [modalHidden, setModalHidden] = useState(true);
   const [modalAction, setModalAction] = useState("");
@@ -276,6 +272,7 @@ function RecordingPlayer({
                   .then(() => {
                     router.refresh();
                   });
+                supabase.storage.from("audios").remove([`${userId}/${id}.mp3`]);
                 setModalHidden(true);
               }}
             >
