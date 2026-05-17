@@ -69,7 +69,7 @@ export default function Home() {
         onClick={() =>
           supabase.auth.signInWithOAuth({
             provider: "google",
-            options: { redirectTo: "http://localhost:3000/auth/callback" },
+            options: { redirectTo: "https://longs.taqi.dev/auth/callback" },
           })
         }
         className="peer-focus:hidden peer-not-placeholder-shown:hidden"
@@ -81,7 +81,7 @@ export default function Home() {
         onClick={() => {
           supabase.auth.signInWithOtp({
             email,
-            options: { emailRedirectTo: "http://localhost:3000/auth/confirm" },
+            options: { emailRedirectTo: "https://longs.taqi.dev/auth/confirm" },
           });
 
           document
