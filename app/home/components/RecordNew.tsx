@@ -17,12 +17,15 @@ import IconButton from "./IconButton";
 import Modal from "./Modal";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import Slider from "./Slider";
+import * as Tone from "tone";
 
 function RecordNew({ userId }: { userId: string }) {
   const supabase = createClient();
   const router = useRouter();
 
   const [recordingUrl, setRecordingUrl] = useState<string>();
+  const [effectsRecordingUrl, setEffectsRecordingUrl] = useState<string>();
   const [recordingPlugin, setRecordingPlugin] = useState<RecordPlugin>();
   const [duration, setDuration] = useState(0);
 
@@ -30,7 +33,13 @@ function RecordNew({ userId }: { userId: string }) {
   const [isUploading, setIsUploading] = useState(false);
 
   const [modalHidden, setModalHidden] = useState(true);
-  const [modalAction, setModalAction] = useState("Delete");
+  const [modalAction, setModalAction] = useState("Effects");
+
+  const [reverb, setReverb] = useState("0");
+  const [pingPongDelay, setPingPongDelay] = useState("0");
+  const [pitch, setPitch] = useState("36");
+  const [distortion, setDistortion] = useState("0");
+  const [gain, setGain] = useState("100");
 
   const [title, setTitle] = useState("");
   const [notes, setNotes] = useState("");
@@ -191,7 +200,7 @@ function RecordNew({ userId }: { userId: string }) {
                     console.log(recordingUrl);
 
                     const recordingData = await (
-                      await fetch(recordingUrl ?? "")
+                      await fetch(effectsRecordingUrl ?? recordingUrl ?? "")
                     ).blob();
 
                     if (!recordingData) return;
@@ -202,8 +211,8 @@ function RecordNew({ userId }: { userId: string }) {
                       await supabase
                         .from("recordings")
                         .insert({
-                          title,
-                          notes,
+                          title: title.trim() === "" ? null : title.trim(),
+                          notes: notes.trim() === "" ? null : notes.trim(),
                           duration,
                           user_id: userId,
                           peaks: wavesurfer?.exportPeaks(),
@@ -211,15 +220,15 @@ function RecordNew({ userId }: { userId: string }) {
                         .select("id")
                     ).data?.at(0)?.id;
 
-                    console.log(`${userId}/${id}.mp3`);
+                    console.log(`${userId}/${id}.wav`);
 
                     await supabase.storage
                       .from("audios")
-                      .upload(`${userId}/${id}.mp3`, recordingData);
+                      .upload(`${userId}/${id}.wav`, recordingData);
 
                     setIsModifying(false);
                     setIsUploading(false);
-                    router.refresh();
+                    window.location.reload() // i dont know why router.refresh doesnt do the trick anymore and im too tired to figure it out its currently 1 am.
                   }}
                 >
                   <Check className="size-8 mt-1 stroke-[1.5]" />
@@ -245,7 +254,163 @@ function RecordNew({ userId }: { userId: string }) {
         setHidden={setModalHidden}
       >
         {modalAction === "Effects" ? (
-          <div>HELLO</div>
+          <div className="flex flex-col justify-center items-center gap-4">
+            <div>
+              <Slider
+                label="Reverb"
+                formatValue={(value) => `${value}ms`}
+                rangeValue={reverb}
+                setRangeValue={setReverb}
+                max={2000}
+              />
+              <Slider
+                label="PingPong Delay"
+                formatValue={(value) => `${value}ms`}
+                rangeValue={pingPongDelay}
+                setRangeValue={setPingPongDelay}
+                max={1000}
+              />
+              <Slider
+                label="Pitch"
+                defaultValue={"36"}
+                formatValue={(value) => {
+                  const numberValue = value - 36;
+                  return `${numberValue > 0 ? "+" : ""}${numberValue} S`;
+                }}
+                rangeValue={pitch}
+                setRangeValue={setPitch}
+                max={72}
+              />
+              <Slider
+                label="Distortion"
+                defaultValue={"0"}
+                formatValue={(value) => {
+                  return `${value}%`;
+                }}
+                rangeValue={distortion}
+                setRangeValue={setDistortion}
+                max={100}
+              /><Slider
+                label="Gain"
+                defaultValue={"100"}
+                formatValue={(value) => {
+                  return `${value}%`;
+                }}
+                rangeValue={gain}
+                setRangeValue={setGain}
+                max={300}
+              />
+            </div>
+            <button
+              className="grow-0 m-auto my-1"
+              onClick={async () => {
+                if (!recordingUrl) return;
+
+                const renderingPromise = Tone.Offline(async ({ transport }) => {
+                  // this part copy pasted ai cuz im js tryna random solutions atp
+                  const arrayBuffer = await fetch(recordingUrl).then((r) =>
+                    r.arrayBuffer(),
+                  );
+                  const mainCtx = new AudioContext();
+                  const decoded = await mainCtx.decodeAudioData(arrayBuffer);
+                  await mainCtx.close();
+
+                  const player = new Tone.Player();
+                  player.buffer.set(decoded);
+
+                  // back to me
+
+
+                  const effectsArray = [];
+
+                  if (reverb !== "0") {
+                    const reverbEffect = new Tone.Reverb({decay: parseInt(reverb) / 1000});
+
+                    effectsArray.push(reverbEffect);
+                  }
+
+                  if (pingPongDelay !== "0") {
+                    const pingPongDelayEffect = new Tone.PingPongDelay({delayTime: parseInt(pingPongDelay) / 1000});
+
+                  effectsArray.push(pingPongDelayEffect)
+                  }
+
+                  if (pitch !== "36") {
+                    const pitchEffect = new Tone.PitchShift(parseInt(pitch) - 36);
+
+                    effectsArray.push(pitchEffect);
+                  }
+
+                  if (distortion !== "0") {
+                    const distortionEffect = new Tone.Distortion(parseInt(distortion) / 100);
+
+                    effectsArray.push(distortionEffect)
+                  }
+
+                  if (gain !== "100") {
+                    const gainEffect = new Tone.Gain(parseInt(gain) / 100)
+
+                    effectsArray.push(gainEffect);
+                  }
+
+                  player.chain(
+                    ...effectsArray,
+                    Tone.getDestination(),
+                  );
+
+                  await Tone.loaded();
+                  player.start(0);
+
+                  transport.start();
+                }, wavesurfer?.getDuration() ?? duration);
+
+                const buffer = (await renderingPromise).get();
+                if (!buffer) return;
+
+                console.log(buffer);
+
+                // following function converts Float32Array to Int16Array, modernized a version I found on github issues for lamejs
+                const convertArray = (
+                  bufferData: Float32Array<ArrayBuffer>,
+                ): Int16Array<ArrayBuffer> => {
+                  const len = bufferData.length;
+                  const dataAsInt16Array = new Int16Array(len);
+
+                  const convert = (n: number) => {
+                    const v = n < 0 ? n * 32768 : n * 32767; // convert in range [-32768, 32767]
+                    return Math.max(-32768, Math.min(32768, v)); // clamp
+                  };
+
+                  for (let i = 0; i < len; i++) {
+                    dataAsInt16Array[i] = convert(bufferData[i]);
+                  }
+
+                  return dataAsInt16Array;
+                };
+
+                const leftChannel = convertArray(buffer.getChannelData(0));
+                const rightChannel = convertArray(buffer.getChannelData(1));
+
+                const audioBlob = encodeWavFromChannels(
+                  leftChannel,
+                  rightChannel,
+                  48000,
+                );
+
+                const newRecordingUrl = URL.createObjectURL(audioBlob);
+
+                console.log(newRecordingUrl);
+
+                setEffectsRecordingUrl(newRecordingUrl);
+
+                wavesurfer?.load(newRecordingUrl);
+
+                setModalHidden(true);
+              }}
+            >
+              Apply
+            </button>
+          </div>
         ) : (
           <div className="flex flex-col justify-center items-center gap-3">
             <p>Are you sure you want to delete this recording?</p>
@@ -267,3 +432,70 @@ function RecordNew({ userId }: { userId: string }) {
 }
 
 export default RecordNew;
+
+// shoving this down here cuz the following is gemini
+
+function encodeWavFromChannels(
+  leftChannel: Int16Array,
+  rightChannel: Int16Array,
+  sampleRate: number = 48000,
+): Blob {
+  // Ensure both channels have matching sample counts
+  const sampleCount = Math.min(leftChannel.length, rightChannel.length);
+
+  // Stereo means 2 channels, and Int16 means 2 bytes per sample
+  const bytesPerSample = 2;
+  const channels = 2;
+
+  // Allocate an ArrayBuffer for the full file: 44 bytes header + PCM Data
+  const pcmDataByteLength = sampleCount * channels * bytesPerSample;
+  const buffer = new ArrayBuffer(44 + pcmDataByteLength);
+  const view = new DataView(buffer);
+
+  /* RIFF identifier */
+  writeString(view, 0, "RIFF");
+  /* file length minus RIFF identifier length */
+  view.setUint32(4, 36 + pcmDataByteLength, true);
+  /* RIFF type */
+  writeString(view, 8, "WAVE");
+  /* format chunk identifier */
+  writeString(view, 12, "fmt ");
+  /* format chunk length */
+  view.setUint32(16, 16, true);
+  /* sample format (raw uncompressed PCM = 1) */
+  view.setUint16(20, 1, true);
+  /* channel count */
+  view.setUint16(22, channels, true);
+  /* sample rate */
+  view.setUint32(24, sampleRate, true);
+  /* byte rate = (sampleRate * blockAlign) */
+  view.setUint32(28, sampleRate * channels * bytesPerSample, true);
+  /* block align = (channels * bytesPerSample) */
+  view.setUint16(32, channels * bytesPerSample, true);
+  /* bits per sample */
+  view.setUint16(34, 16, true);
+  /* data chunk identifier */
+  writeString(view, 36, "data");
+  /* chunk length */
+  view.setUint32(40, pcmDataByteLength, true);
+
+  // Write Interleaved PCM Audio Samples
+  let offset = 44;
+  for (let i = 0; i < sampleCount; i++) {
+    // Write Left Sample
+    view.setInt16(offset, leftChannel[i], true);
+    offset += 2;
+    // Write Right Sample
+    view.setInt16(offset, rightChannel[i], true);
+    offset += 2;
+  }
+
+  return new Blob([buffer], { type: "audio/wav" });
+}
+
+// Helper function to write ASCII characters into the DataView
+function writeString(view: DataView, offset: number, string: string): void {
+  for (let i = 0; i < string.length; i++) {
+    view.setUint8(offset + i, string.charCodeAt(i));
+  }
+}

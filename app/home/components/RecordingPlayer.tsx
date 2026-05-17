@@ -8,7 +8,6 @@ import {
 import { useEffect, useRef, useState } from "react";
 import Modal from "./Modal";
 import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
 import { useWavesurfer } from "@wavesurfer/react";
 
 function RecordingPlayer({
@@ -79,7 +78,7 @@ function RecordingPlayer({
       (
         await supabase.storage
           .from("audios")
-          .createSignedUrl(`${userId}/${id}.mp3`, 120)
+          .createSignedUrl(`${userId}/${id}.wav`, 120)
       ).data?.signedUrl ?? "",
     );
 
@@ -190,7 +189,7 @@ function RecordingPlayer({
 
                 const a = document.createElement("a");
                 a.href = recordingUrl;
-                a.download = `${title}.mp3`;
+                a.download = `${title}.wav`;
                 a.click();
                 a.remove();
               }}
@@ -272,7 +271,7 @@ function RecordingPlayer({
                   .then(() => {
                     refresh();
                   });
-                supabase.storage.from("audios").remove([`${userId}/${id}.mp3`]);
+                supabase.storage.from("audios").remove([`${userId}/${id}.wav`]);
                 setModalHidden(true);
               }}
             >
