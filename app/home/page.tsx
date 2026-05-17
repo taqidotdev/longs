@@ -2,11 +2,17 @@ import { createClient } from "@/lib/supabase/server";
 import UserOptions from "./components/UserOptions";
 import Recordings, { recordingsSchema } from "./components/Recordings";
 import RecordNew from "./components/RecordNew";
+import { NextResponse } from "next/server";
 
 export default async function Home() {
   const supabase = await createClient();
 
   const { data } = await supabase.auth.getClaims();
+
+  if (!data) {
+    NextResponse.redirect("/");
+    return;
+  }
 
   const recordings = (
     await supabase
