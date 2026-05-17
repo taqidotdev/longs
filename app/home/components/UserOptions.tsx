@@ -51,7 +51,6 @@ function UserOptions(data: Claims) {
           <p
             className="white-link"
             onClick={() => {
-              console.log("modal hiddihgng");
               setModalHidden(false);
             }}
           >

@@ -57,12 +57,10 @@ function RecordingPlayer({
 
   const handleTimeUpdate = () => {
     const dur = Math.floor(currentTime ?? recordingDuration);
-    console.log(dur);
     setDuration(formatDuration(dur));
   };
 
   useEffect(() => {
-    console.log(isPlaying);
     wavesurfer?.on("timeupdate", handleTimeUpdate);
     wavesurfer?.on("finish", () => {
       setDuration(
@@ -92,7 +90,6 @@ function RecordingPlayer({
 
       return;
     }
-    console.log("hello");
 
     await fetchAudio();
   };
@@ -243,7 +240,6 @@ function RecordingPlayer({
             <button
               className="grow-0 m-auto my-1"
               onClick={() => {
-                console.log(`${newTitle}, ${newNotes}`);
                 supabase
                   .from("recordings")
                   .update({ title: newTitle, notes: newNotes })
@@ -263,7 +259,6 @@ function RecordingPlayer({
             <button
               className="grow-0 m-auto my-1"
               onClick={() => {
-                console.log(`${newTitle}, ${newNotes}`);
                 supabase
                   .from("recordings")
                   .delete()

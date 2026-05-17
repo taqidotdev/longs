@@ -71,7 +71,6 @@ function RecordNew({ userId }: { userId: string }) {
   });
 
   useEffect(() => {
-    console.log(`wavesurfer: ${wavesurfer}`);
     const recording = wavesurfer
       ?.getActivePlugins()
       .filter((p) => p instanceof RecordPlugin)[0] as RecordPlugin | undefined;
@@ -90,8 +89,6 @@ function RecordNew({ userId }: { userId: string }) {
 
   const handleRecord = () => {
     if (recordingPlugin?.isRecording()) {
-      console.log("stopping recording");
-      console.log(recordingPlugin);
       recordingPlugin.stopRecording();
       setIsModifying(true);
       return;
@@ -197,8 +194,6 @@ function RecordNew({ userId }: { userId: string }) {
                 </IconButton>
                 <IconButton
                   onClick={async () => {
-                    console.log(recordingUrl);
-
                     const recordingData = await (
                       await fetch(effectsRecordingUrl ?? recordingUrl ?? "")
                     ).blob();
@@ -220,15 +215,13 @@ function RecordNew({ userId }: { userId: string }) {
                         .select("id")
                     ).data?.at(0)?.id;
 
-                    console.log(`${userId}/${id}.wav`);
-
                     await supabase.storage
                       .from("audios")
                       .upload(`${userId}/${id}.wav`, recordingData);
 
                     setIsModifying(false);
                     setIsUploading(false);
-                    window.location.reload() // i dont know why router.refresh doesnt do the trick anymore and im too tired to figure it out its currently 1 am.
+                    window.location.reload(); // i dont know why router.refresh doesnt do the trick anymore and im too tired to figure it out its currently 1 am.
                   }}
                 >
                   <Check className="size-8 mt-1 stroke-[1.5]" />
@@ -290,7 +283,8 @@ function RecordNew({ userId }: { userId: string }) {
                 rangeValue={distortion}
                 setRangeValue={setDistortion}
                 max={100}
-              /><Slider
+              />
+              <Slider
                 label="Gain"
                 defaultValue={"100"}
                 formatValue={(value) => {
@@ -320,43 +314,47 @@ function RecordNew({ userId }: { userId: string }) {
 
                   // back to me
 
-
                   const effectsArray = [];
 
                   if (reverb !== "0") {
-                    const reverbEffect = new Tone.Reverb({decay: parseInt(reverb) / 1000});
+                    const reverbEffect = new Tone.Reverb({
+                      decay: parseInt(reverb) / 1000,
+                    });
 
                     effectsArray.push(reverbEffect);
                   }
 
                   if (pingPongDelay !== "0") {
-                    const pingPongDelayEffect = new Tone.PingPongDelay({delayTime: parseInt(pingPongDelay) / 1000});
+                    const pingPongDelayEffect = new Tone.PingPongDelay({
+                      delayTime: parseInt(pingPongDelay) / 1000,
+                    });
 
-                  effectsArray.push(pingPongDelayEffect)
+                    effectsArray.push(pingPongDelayEffect);
                   }
 
                   if (pitch !== "36") {
-                    const pitchEffect = new Tone.PitchShift(parseInt(pitch) - 36);
+                    const pitchEffect = new Tone.PitchShift(
+                      parseInt(pitch) - 36,
+                    );
 
                     effectsArray.push(pitchEffect);
                   }
 
                   if (distortion !== "0") {
-                    const distortionEffect = new Tone.Distortion(parseInt(distortion) / 100);
+                    const distortionEffect = new Tone.Distortion(
+                      parseInt(distortion) / 100,
+                    );
 
-                    effectsArray.push(distortionEffect)
+                    effectsArray.push(distortionEffect);
                   }
 
                   if (gain !== "100") {
-                    const gainEffect = new Tone.Gain(parseInt(gain) / 100)
+                    const gainEffect = new Tone.Gain(parseInt(gain) / 100);
 
                     effectsArray.push(gainEffect);
                   }
 
-                  player.chain(
-                    ...effectsArray,
-                    Tone.getDestination(),
-                  );
+                  player.chain(...effectsArray, Tone.getDestination());
 
                   await Tone.loaded();
                   player.start(0);
@@ -366,8 +364,6 @@ function RecordNew({ userId }: { userId: string }) {
 
                 const buffer = (await renderingPromise).get();
                 if (!buffer) return;
-
-                console.log(buffer);
 
                 // following function converts Float32Array to Int16Array, modernized a version I found on github issues for lamejs
                 const convertArray = (
@@ -398,8 +394,6 @@ function RecordNew({ userId }: { userId: string }) {
                 );
 
                 const newRecordingUrl = URL.createObjectURL(audioBlob);
-
-                console.log(newRecordingUrl);
 
                 setEffectsRecordingUrl(newRecordingUrl);
 
