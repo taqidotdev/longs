@@ -17,7 +17,6 @@ function RecordingPlayer({
   id,
   userId,
   peaks,
-  refresh,
 }: {
   recordingDuration: number;
   title: string;
@@ -25,7 +24,6 @@ function RecordingPlayer({
   id: number;
   userId: string;
   peaks: number[][];
-  refresh: () => void;
 }) {
   const supabase = createClient();
 
@@ -245,7 +243,7 @@ function RecordingPlayer({
                   .update({ title: newTitle, notes: newNotes })
                   .eq("id", id)
                   .then(() => {
-                    refresh();
+                    window.location.reload()
                   });
                 setModalHidden(true);
               }}
@@ -264,7 +262,7 @@ function RecordingPlayer({
                   .delete()
                   .eq("id", id)
                   .then(() => {
-                    refresh();
+                    window.location.reload()
                   });
                 supabase.storage.from("audios").remove([`${userId}/${id}.wav`]);
                 setModalHidden(true);
